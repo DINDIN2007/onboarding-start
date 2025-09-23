@@ -14,7 +14,7 @@ module spi_peripheral(
     output wire [7:0] en_reg_out_15_8,     // Enable outputs on uio_out[7:0]
     output wire [7:0] en_reg_pwm_7_0,      // Enable PWM for uo_out[7:0]
     output wire [7:0] en_reg_pwm_15_8,     // Enable PWM for uio_out[7:0]
-    output wire [7:0] pwm_duty_cycle,      // PWM Duty Cycle (0x00 = 0%, 0xFF = 100%)
+    output wire [7:0] pwm_duty_cycle       // PWM Duty Cycle (0x00 = 0%, 0xFF = 100%)
 );
     // SPI Interface "Key Features"
     reg read_write_bit;
