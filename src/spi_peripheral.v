@@ -85,12 +85,12 @@ module spi_peripheral(
             else if (nCS_sync2) begin
                 transaction_active <= 1'b0;
                 
-                // 
+                // Check if the correct number of bits (16) was received
                 if (transaction_bit_counter == 16) begin
                     transaction_ready <= 1'b1;
                 end
                 
-                //
+                // If the number of bits is not 16, the transaction is invalid
                 else begin
                     transaction_ready <= 1'b0;    
                 end

@@ -30,7 +30,7 @@ module tt_um_uwasic_onboarding_dinh_viet_luong (
   wire [7:0] pwm_duty_cycle;
 
   // Instantiate the SPI Peripheral Module
-  spi_peripheral spi_peripheral_inst {
+  spi_peripheral spi_peripheral_inst (
     .clk(clk),
     .rst_n(rst_n),
 
@@ -43,7 +43,7 @@ module tt_um_uwasic_onboarding_dinh_viet_luong (
     .en_reg_pwm_15_8(en_reg_pwm_15_8),
     .en_reg_pwm_7_0(en_reg_pwm_7_0),
     .pwm_duty_cycle(pwm_duty_cycle)
-  }
+  );
 
   // Instantiate the PWM module
   pwm_peripheral pwm_peripheral_inst (
