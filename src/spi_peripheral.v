@@ -128,7 +128,7 @@ module spi_peripheral(
 
             ////////////////////////////////////////////////////////////////////////////////////
             // Update PWM Peripheral after receiving data
-            if ((address > 7'h00) && (address < 7'h04)) begin
+            if (address < 7'h04) begin
                 // From Register Map
                 case (address)
                     7'h00: en_reg_out_7_0 <= data;
