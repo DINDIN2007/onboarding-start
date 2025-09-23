@@ -98,6 +98,21 @@ module spi_peripheral(
                 else begin
                     transaction_ready <= 1'b0;    
                 end
+
+                // Update PWM Peripheral after receiving data
+                if (transaction_ready && read_write_bit) begin
+                    if (address <= 7'h04) begin
+                        // From Register Map
+                        case (address)
+                            7'h00: en_reg_out_7_0 <= data;
+                            7'h01: en_reg_out_15_8 <= data;
+                            7'h02: en_reg_pwm_7_0 <= data;
+                            7'h03: en_reg_pwm_15_8 <= data;
+                            7'h04: pwm_duty_cycle <= data;
+                            default: ;// Ignore if the address is something else
+                        endcase
+                    end
+                end
             end
 
             // Increment bit counter for every SCLK rising edge 
@@ -124,20 +139,6 @@ module spi_peripheral(
                 else if ((transaction_bit_counter >= 9) && (transaction_bit_counter <= 16)) begin
                     data <= {data[6:0], COPI_sync2};
                 end
-            end
-
-            ////////////////////////////////////////////////////////////////////////////////////
-            // Update PWM Peripheral after receiving data
-            if (address < 7'h04) begin
-                // From Register Map
-                case (address)
-                    7'h00: en_reg_out_7_0 <= data;
-                    7'h01: en_reg_out_15_8 <= data;
-                    7'h02: en_reg_pwm_7_0 <= data;
-                    7'h03: en_reg_pwm_15_8 <= data;
-                    7'h04: pwm_duty_cycle <= data;
-                    default: ;// Ignore if the address is something else
-                endcase
             end
         end
     end
