@@ -37,6 +37,15 @@ module spi_peripheral(
     reg transaction_active;
     reg transaction_ready;
 
+    // Edge detection and delays SCLK and nCS signal by one cycle
+    always @(posedge clk or negedge rst_n) begin
+        SCLK_delay_by_1 <= SCLK_sync2;
+        nCS_delay_by_1 <= nCS_sync2;
+    end
+
+    assign SCLK_rising_edge = SCLK_sync2 & ~SCLK_delay_by_1;
+    assign nCS_falling_edge = ~nCS_sync2 & nCS_delay_by_1;
+
     // Signal Synchronization (for CDC)
     always @(posedge clk or negedge rst_n) begin
         if (!rst_n) begin
@@ -48,6 +57,16 @@ module spi_peripheral(
             COPI_sync1 <= 1'b0; COPI_sync2 <= 1'b0;
             nCS_sync1 <= 1'b0; nCS_sync2 <= 1'b0;
 
+            transaction_bit_counter <= 4'b0;
+            transaction_active <= 1'b0;
+            transaction_ready <= 1'b0;
+
+            en_reg_out_7_0 <= 8'b0;
+            en_reg_out_15_8 <= 8'b0;
+            en_reg_pwm_7_0 <= 8'b0;
+            en_reg_pwm_15_8 <= 8'b0;
+            pwm_duty_cycle <= 8'b0;
+
         end else begin
             SCLK_sync1 <= SCLK;
             SCLK_sync2 <= SCLK_sync1;
@@ -57,26 +76,9 @@ module spi_peripheral(
 
             nCS_sync1 <= nCS;
             nCS_sync2 <= nCS_sync1;
-        end
-    end
 
-    // Edge detection and delays SCLK and nCS signal by one cycle
-    always @(posedge clk or negedge rst_n) begin
-        SCLK_delay_by_1 <= SCLK_sync2;
-        nCS_delay_by_1 <= nCS_sync2;
-    end
-
-    assign SCLK_rising_edge = SCLK_sync2 & ~SCLK_delay_by_1;
-    assign nCS_falling_edge = ~nCS_sync2 & nCS_delay_by_1;
-
-    // Transaction
-    always @(posedge clk or negedge rst_n) begin
-        if (!rst_n) begin
-            transaction_bit_counter <= 4'b0;
-            transaction_active <= 1'b0;
-            transaction_ready <= 1'b0;
-        end else begin
-            // Transactions stats on nCS falling edge
+            ////////////////////////////////////////////////////////////////////////////////////
+            // Transactions starts on nCS falling edge
             if (nCS_falling_edge) begin
                 transaction_bit_counter <= 4'b0;
                 transaction_active <= 1'b1;
@@ -104,18 +106,9 @@ module spi_peripheral(
                     transaction_bit_counter <= transaction_bit_counter + 1;
                 end
             end
-        end
-    end
 
-    // Data Capture
-    always @(posedge clk or negedge rst_n) begin
-        if (!rst_n) begin
-            read_write_bit <= 1'b0;
-            address <= 7'b0;
-            data <= 8'b0;
-        end
-
-        else begin
+            ////////////////////////////////////////////////////////////////////////////////////
+            // Data Capture
             if (SCLK_rising_edge && transaction_active) begin
                 // R/W Bit (1b)
                 if (transaction_bit_counter == 1) begin
@@ -132,18 +125,9 @@ module spi_peripheral(
                     data <= {data[6:0], COPI_sync2};
                 end
             end
-        end
-    end
 
-    // Update PWM Peripheral after receiving data
-    always @(posedge clk or negedge rst_n) begin
-        if (!rst_n) begin
-            en_reg_out_7_0 <= 8'b0;
-            en_reg_out_15_8 <= 8'b0;
-            en_reg_pwm_7_0 <= 8'b0;
-            en_reg_pwm_15_8 <= 8'b0;
-            pwm_duty_cycle <= 8'b0;
-        end else if (transaction_ready && read_write_bit) begin
+            ////////////////////////////////////////////////////////////////////////////////////
+            // Update PWM Peripheral after receiving data
             if ((address > 7'h00) && (address < 7'h04)) begin
                 // From Register Map
                 case (address)
