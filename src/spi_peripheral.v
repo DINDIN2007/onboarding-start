@@ -33,10 +33,9 @@ module spi_peripheral(
     reg nCS_falling_edge;
 
     // Transaction state
-    reg [3:0] transaction_bit_counter; // Indicate whether its reading the read_write bit, the address bits or the data bits
+    reg [4:0] transaction_bit_counter; // Indicate whether its reading the read_write bit, the address bits or the data bits
     reg transaction_active;
     reg transaction_ready;
-    reg transaction_processed;
 
     // Signal Synchronization (for CDC)
     always @(posedge clk or negedge rst_n) begin
@@ -66,6 +65,9 @@ module spi_peripheral(
         SCLK_delay_by_1 <= SCLK_sync2;
         nCS_delay_by_1 <= nCS_sync2;
     end
+
+    assign SCLK_rising_edge = SCLK_sync2 & ~SCLK_delay_by_1;
+    assign nCS_falling_edge = ~nCS_sync2 & nCS_delay_by_1;
 
     // Transaction
     always @(posedge clk or negedge rst_n) begin
