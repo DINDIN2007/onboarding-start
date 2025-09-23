@@ -10,11 +10,11 @@ module spi_peripheral(
     input wire SCLK,    // Serial Clock (Clock signal from controller)
 
     // PWM Inputs
-    output wire [7:0] en_reg_out_7_0,      // Enable outputs on uo_out[7:0]
-    output wire [7:0] en_reg_out_15_8,     // Enable outputs on uio_out[7:0]
-    output wire [7:0] en_reg_pwm_7_0,      // Enable PWM for uo_out[7:0]
-    output wire [7:0] en_reg_pwm_15_8,     // Enable PWM for uio_out[7:0]
-    output wire [7:0] pwm_duty_cycle       // PWM Duty Cycle (0x00 = 0%, 0xFF = 100%)
+    output reg [7:0] en_reg_out_7_0,      // Enable outputs on uo_out[7:0]
+    output reg [7:0] en_reg_out_15_8,     // Enable outputs on uio_out[7:0]
+    output reg [7:0] en_reg_pwm_7_0,      // Enable PWM for uo_out[7:0]
+    output reg [7:0] en_reg_pwm_15_8,     // Enable PWM for uio_out[7:0]
+    output reg [7:0] pwm_duty_cycle       // PWM Duty Cycle (0x00 = 0%, 0xFF = 100%)
 );
     // SPI Interface "Key Features"
     reg read_write_bit;
@@ -150,7 +150,7 @@ module spi_peripheral(
                     7'h02: en_reg_pwm_7_0 <= data;
                     7'h03: en_reg_pwm_15_8 <= data;
                     7'h04: pwm_duty_cycle <= data;
-                    default: // Ignore if the address is something else
+                    default: ;// Ignore if the address is something else
                 endcase
             end
         end
