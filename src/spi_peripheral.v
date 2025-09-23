@@ -37,12 +37,7 @@ module spi_peripheral(
     reg transaction_active;
     reg transaction_ready;
 
-    // Edge detection and delays SCLK and nCS signal by one cycle
-    always @(posedge clk or negedge rst_n) begin
-        SCLK_delay_by_1 <= SCLK_sync2;
-        nCS_delay_by_1 <= nCS_sync2;
-    end
-
+    // Edge detection and delays
     assign SCLK_rising_edge = SCLK_sync2 & ~SCLK_delay_by_1;
     assign nCS_falling_edge = ~nCS_sync2 & nCS_delay_by_1;
 
@@ -76,6 +71,11 @@ module spi_peripheral(
 
             nCS_sync1 <= nCS;
             nCS_sync2 <= nCS_sync1;
+
+            ////////////////////////////////////////////////////////////////////////////////////
+            // Edge detection and delays SCLK and nCS signal by one cycle
+            SCLK_delay_by_1 <= SCLK_sync2;
+            nCS_delay_by_1 <= nCS_sync2;
 
             ////////////////////////////////////////////////////////////////////////////////////
             // Transactions starts on nCS falling edge
