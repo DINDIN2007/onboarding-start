@@ -52,7 +52,7 @@ module spi_peripheral(
             COPI_sync1 <= 1'b0; COPI_sync2 <= 1'b0;
             nCS_sync1 <= 1'b0; nCS_sync2 <= 1'b0;
 
-            transaction_bit_counter <= 4'b0;
+            transaction_bit_counter <= 5'b0;
             transaction_active <= 1'b0;
             transaction_ready <= 1'b0;
 
@@ -80,7 +80,7 @@ module spi_peripheral(
             ////////////////////////////////////////////////////////////////////////////////////
             // Transactions starts on nCS falling edge
             if (nCS_falling_edge) begin
-                transaction_bit_counter <= 4'b0;
+                transaction_bit_counter <= 5'b0;
                 transaction_active <= 1'b1;
                 transaction_ready <= 1'b0;
             end
@@ -115,29 +115,28 @@ module spi_peripheral(
                 end
             end
 
-            // Increment bit counter for every SCLK rising edge 
-            else if (SCLK_rising_edge && transaction_active) begin
-                if (transaction_bit_counter < 16) begin
-                    transaction_bit_counter <= transaction_bit_counter + 1;
-                end
-            end
-
             ////////////////////////////////////////////////////////////////////////////////////
             // Data Capture
-            if (SCLK_rising_edge && transaction_active) begin
+            // Increment bit counter for every SCLK rising edge 
+            else if (SCLK_rising_edge && transaction_active) begin
                 // R/W Bit (1b)
-                if (transaction_bit_counter == 1) begin
+                if (transaction_bit_counter == 0) begin
                     read_write_bit <= COPI_sync2;
                 end
 
                 // Address (7b)
-                else if ((transaction_bit_counter >= 2) && (transaction_bit_counter <= 8)) begin
+                else if ((transaction_bit_counter >= 1) && (transaction_bit_counter <= 7)) begin
                     address <= {address[5:0], COPI_sync2};
                 end
 
                 // Data (8b)
-                else if ((transaction_bit_counter >= 9) && (transaction_bit_counter <= 16)) begin
+                else if ((transaction_bit_counter >= 8) && (transaction_bit_counter <= 15)) begin
                     data <= {data[6:0], COPI_sync2};
+                end
+
+                // Increment bit counter for every SCLK rising edge 
+                if (transaction_bit_counter < 16) begin
+                    transaction_bit_counter <= transaction_bit_counter + 1;
                 end
             end
         end
