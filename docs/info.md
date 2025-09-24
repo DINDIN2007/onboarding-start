@@ -9,12 +9,32 @@ You can also include images in this folder and reference them in the markdown. E
 
 ## How it works
 
-This is a SPI-controlled PWM peripheral. It operates at **10 MHz** and uses SPI communication at **\~100 KHz** to configure registers that control output enables, PWM enables, and duty cycles. The system comprises two main modules: an **SPI Peripheral** for register management and a **PWM Peripheral** for signal generation. 
+This is a SPI-controlled PWM peripheral. It operates at **10 MHz** and uses SPI communication at **\~100 KHz** to configure registers of the PWM.
+
+In order to do so, the SPI peripheral takes in three signals :
+
+- **SCLK (Serial Clock)**, Clock signal from the controller
+- **nCS (Chip select)**, Signals whether or not to enable communication between the controller and the peripheral.
+- **COPI (Controller Out Peripheral In)**, This essentially is the 16 bistream of data that the spi peripheral takes in and uses to configure the pwm peripheral.
+
+and through COPI, the SPI peripheral writes data to the corresponding registers of the PWM peripheral, which are :
+
+- Enable Outputs
+- Enable PWMs
+- Set the Duty cycles
+
+with the 16 bitstream from COPI in the format :
+
+- Read/Write (1 bit)
+- Address (7 bit)
+- Data (8 bit)
+
+**Note:** Only write operations go through, read operations are ignored.
 
 ## How to test
 
-Placeholder text (i don't know how this works yet)
+Navigate to the /test directory and run Cocotb simulations with the test itself being written in the `test.py` file. In order to do so, run the MakeFile using command `make -B`. To see the waveform, run the generated `tb.vcd` file along with `tb.vcd` with command `gtkwave tb.vcd tb.gtkw`.
 
 ## External hardware
 
-SPI Peripheral, PWM Peripheral, 
+This design relies on a clock source and an external SPI controller, and is comprised of a SPI Peripheral and PWM Peripheral.
