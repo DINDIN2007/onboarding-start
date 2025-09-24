@@ -17,13 +17,13 @@ In order to do so, the SPI peripheral takes in three signals :
 - **nCS (Chip select)**, Signals whether or not to enable communication between the controller and the peripheral.
 - **COPI (Controller Out Peripheral In)**, This essentially is the 16 bistream of data that the spi peripheral takes in and uses to configure the pwm peripheral.
 
-and through COPI, the SPI peripheral writes data to the corresponding registers of the PWM peripheral, which are :
+and through COPI, the SPI peripheral writes data to the corresponding registers of the PWM peripheral. The available settings are :
 
 - Enable Outputs
 - Enable PWMs
 - Set the Duty cycles
 
-with the 16 bitstream from COPI in the format :
+And the input 16 bitstream from COPI to the SPI peripheral is in the format :
 
 - Read/Write (1 bit)
 - Address (7 bit)
@@ -33,7 +33,7 @@ with the 16 bitstream from COPI in the format :
 
 ## How to test
 
-Navigate to the /test directory and run Cocotb simulations with the test itself being written in the `test.py` file. In order to do so, run the MakeFile using command `make -B`. To see the waveform, run the generated `tb.vcd` file along with `tb.vcd` with command `gtkwave tb.vcd tb.gtkw`.
+Navigate to the /test directory and run Cocotb simulations with the test itself being written in the `test.py` file. In order to do so, run the MakeFile using command `make -B`. To see the waveform, run the generated `tb.vcd` file along with `tb.gtkw` with command `gtkwave tb.vcd tb.gtkw`.
 
 ## External hardware
 
