@@ -37,10 +37,6 @@ module spi_peripheral(
     reg transaction_active;
     reg transaction_ready;
 
-    // Edge detection and delays
-    assign SCLK_rising_edge = SCLK_sync2 & ~SCLK_delay_by_1;
-    assign nCS_falling_edge = ~nCS_sync2 & nCS_delay_by_1;
-
     // Signal Synchronization (for CDC)
     always @(posedge clk or negedge rst_n) begin
         if (!rst_n) begin
@@ -52,9 +48,19 @@ module spi_peripheral(
             COPI_sync1 <= 1'b0; COPI_sync2 <= 1'b0;
             nCS_sync1 <= 1'b0; nCS_sync2 <= 1'b0;
 
+            SCLK_delay_by_1 <= 1'b0;
+            nCS_delay_by_1 <= 1'b0;
+
+            SCLK_rising_edge <= 1'b0;
+            nCS_falling_edge <= 1'b0;
+
             transaction_bit_counter <= 5'b0;
             transaction_active <= 1'b0;
             transaction_ready <= 1'b0;
+
+            read_write_bit <= 1'b0;
+            address <= 7'b0;
+            data <= 8'b0;
 
             en_reg_out_7_0 <= 8'b0;
             en_reg_out_15_8 <= 8'b0;
@@ -76,6 +82,9 @@ module spi_peripheral(
             // Edge detection and delays SCLK and nCS signal by one cycle
             SCLK_delay_by_1 <= SCLK_sync2;
             nCS_delay_by_1 <= nCS_sync2;
+
+            SCLK_rising_edge <= SCLK_sync2 & ~SCLK_delay_by_1;
+            nCS_falling_edge <= ~nCS_sync2 & nCS_delay_by_1;
 
             ////////////////////////////////////////////////////////////////////////////////////
             // Transactions starts on nCS falling edge
