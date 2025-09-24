@@ -58,10 +58,6 @@ module spi_peripheral(
             transaction_active <= 1'b0;
             transaction_ready <= 1'b0;
 
-            read_write_bit <= 1'b0;
-            address <= 7'b0;
-            data <= 8'b0;
-
             en_reg_out_7_0 <= 8'b0;
             en_reg_out_15_8 <= 8'b0;
             en_reg_pwm_7_0 <= 8'b0;
